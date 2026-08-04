@@ -62,7 +62,11 @@ class CommentService
             }
         }
 
-        return $this->commentRepository->create($dto);
+        $comment = $this->commentRepository->create($dto);
+
+        \App\Events\CommentPosted::dispatch($comment);
+
+        return $comment;
     }
 
     public function update(Comment $comment, UpdateCommentDTO $dto): Comment

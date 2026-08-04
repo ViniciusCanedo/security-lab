@@ -22,6 +22,8 @@ class ArticleResource extends JsonResource
             'content' => $this->content,
             'cover_image_url' => $this->cover_image_url,
             'status' => $this->status->value,
+            'views_count' => $this->views_count,
+            'reading_time_minutes' => $this->reading_time_minutes,
             'author' => new UserResource($this->whenLoaded('author')),
             'likes_count' => $this->likes()->count(),
             'user_has_liked' => $request->user() ? $this->likes()->where('user_id', $request->user()->id)->exists() : false,

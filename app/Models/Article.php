@@ -11,13 +11,15 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+use Laravel\Scout\Searchable;
+
 /**
  * @property ArticleStatus $status
  */
 class Article extends Model
 {
     /** @use HasFactory<ArticleFactory> */
-    use HasFactory, SoftDeletes;
+    use HasFactory, Searchable, SoftDeletes;
 
     protected $fillable = [
         'user_id',
@@ -27,6 +29,7 @@ class Article extends Model
         'content',
         'cover_image_url',
         'status',
+        'views_count',
     ];
 
     protected function casts(): array
@@ -36,6 +39,9 @@ class Article extends Model
         ];
     }
 
+    /**
+     * @return BelongsTo<User, $this>
+     */
     public function author(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
@@ -54,5 +60,28 @@ class Article extends Model
     public function scopePublished(Builder $query): Builder
     {
         return $query->where('status', ArticleStatus::PUBLISHED);
+    }
+
+    public function getReadingTimeMinutesAttribute(): int
+    {
+        $words = str_word_count(strip_tags((string) $this->content));
+
+        return (int) max(1, ceil($words / 200));
+    }
+
+    /**
+     * Get the indexable data array for the model.
+     *
+     * @return array<string, mixed>
+     */
+    public function toSearchableArray(): array
+    {
+        return [
+            'id' => (int) $this->id,
+            'title' => $this->title,
+            'summary' => $this->summary,
+            'content' => $this->content,
+            'status' => $this->status->value,
+        ];
     }
 }

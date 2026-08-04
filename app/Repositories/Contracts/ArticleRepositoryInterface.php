@@ -22,6 +22,8 @@ interface ArticleRepositoryInterface
 
     public function getPublishedPaginated(ArticleQueryDTO $query): LengthAwarePaginator;
 
+    public function searchPublished(string $term, int $perPage = 15): LengthAwarePaginator;
+
     public function create(CreateArticleDTO $dto): Article;
 
     public function update(Article $article, UpdateArticleDTO $dto): Article;

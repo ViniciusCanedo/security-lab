@@ -58,6 +58,7 @@ Route::prefix('v1')->group(function () {
     });
 
     // Public Article Endpoints
+    Route::get('articles/search', [PublicArticleController::class, 'search']);
     Route::get('articles', [PublicArticleController::class, 'index']);
     Route::get('articles/{id}/comments', [CommentController::class, 'index']);
     Route::get('articles/{idOrSlug}', [PublicArticleController::class, 'show']);

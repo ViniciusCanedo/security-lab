@@ -84,6 +84,13 @@ class ArticleRepositoryEloquent implements ArticleRepositoryInterface
         return $builder->paginate($query->perPage);
     }
 
+    public function searchPublished(string $term, int $perPage = 15): LengthAwarePaginator
+    {
+        return Article::search($term)
+            ->where('status', \App\Enums\ArticleStatus::PUBLISHED->value)
+            ->paginate($perPage);
+    }
+
     public function create(CreateArticleDTO $dto): Article
     {
         $slug = Str::slug($dto->title);

@@ -48,6 +48,11 @@ class ArticleService
         return $this->repository->getPublishedPaginated($query);
     }
 
+    public function searchPublished(string $term, int $perPage = 15): LengthAwarePaginator
+    {
+        return $this->repository->searchPublished($term, $perPage);
+    }
+
     public function create(CreateArticleDTO $dto): Article
     {
         return $this->repository->create($dto);

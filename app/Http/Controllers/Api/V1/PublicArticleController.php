@@ -23,6 +23,16 @@ class PublicArticleController extends Controller
         return new ArticleCollection($articles);
     }
 
+    public function search(Request $request): ArticleCollection
+    {
+        $term = (string) $request->query('q', '');
+        $perPage = (int) $request->query('per_page', 15);
+
+        $articles = $this->service->searchPublished($term, $perPage);
+
+        return new ArticleCollection($articles);
+    }
+
     public function show(int|string $idOrSlug): ArticleResource
     {
         $article = is_numeric($idOrSlug)
@@ -32,6 +42,8 @@ class PublicArticleController extends Controller
         if (! $article) {
             abort(404, 'Artigo não encontrado.');
         }
+
+        \App\Jobs\IncrementArticleViewCountJob::dispatch($article->id);
 
         return new ArticleResource($article);
     }
