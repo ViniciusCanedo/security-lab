@@ -23,6 +23,8 @@ class ArticleResource extends JsonResource
             'cover_image_url' => $this->cover_image_url,
             'status' => $this->status->value,
             'author' => new UserResource($this->whenLoaded('author')),
+            'likes_count' => $this->likes()->count(),
+            'user_has_liked' => $request->user() ? $this->likes()->where('user_id', $request->user()->id)->exists() : false,
             'created_at' => $this->created_at?->toIso8601String(),
             'updated_at' => $this->updated_at?->toIso8601String(),
         ];

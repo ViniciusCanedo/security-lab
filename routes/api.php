@@ -3,6 +3,8 @@
 use App\Http\Controllers\Api\V1\AdminUserController;
 use App\Http\Controllers\Api\V1\ArticleController;
 use App\Http\Controllers\Api\V1\AuthController;
+use App\Http\Controllers\Api\V1\CommentController;
+use App\Http\Controllers\Api\V1\LikeController;
 use App\Http\Controllers\Api\V1\PublicArticleController;
 use Illuminate\Support\Facades\Route;
 
@@ -39,10 +41,22 @@ Route::prefix('v1')->group(function () {
             Route::put('/{id}', [ArticleController::class, 'update']);
             Route::patch('/{id}/archive', [ArticleController::class, 'archive']);
             Route::delete('/{id}', [ArticleController::class, 'destroy']);
+
+            // Engagement Routes (Likes & Comments)
+            Route::post('/{id}/like', [LikeController::class, 'toggle']);
+            Route::post('/{id}/comments', [CommentController::class, 'store']);
+        });
+
+        // Comment Management Routes
+        Route::prefix('comments')->group(function () {
+            Route::post('/{id}/replies', [CommentController::class, 'reply']);
+            Route::put('/{id}', [CommentController::class, 'update']);
+            Route::delete('/{id}', [CommentController::class, 'destroy']);
         });
     });
 
     // Public Article Endpoints
     Route::get('articles', [PublicArticleController::class, 'index']);
+    Route::get('articles/{id}/comments', [CommentController::class, 'index']);
     Route::get('articles/{idOrSlug}', [PublicArticleController::class, 'show']);
 });
