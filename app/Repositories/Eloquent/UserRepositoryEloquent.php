@@ -23,6 +23,13 @@ class UserRepositoryEloquent implements UserRepositoryInterface
         return User::where('google_id', $googleId)->first();
     }
 
+    public function findBySocialProvider(string $provider, string $providerId): ?User
+    {
+        return User::whereHas('socialAccounts', function ($q) use ($provider, $providerId) {
+            $q->where('provider', $provider)->where('provider_id', $providerId);
+        })->first();
+    }
+
     public function create(array $data): User
     {
         return User::create($data);

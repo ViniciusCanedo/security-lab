@@ -13,6 +13,8 @@ interface UserRepositoryInterface
 
     public function findByGoogleId(string $googleId): ?User;
 
+    public function findBySocialProvider(string $provider, string $providerId): ?User;
+
     /**
      * @param  array{name: string, email: string, password?: string|null, google_id?: string|null, avatar?: string|null}  $data
      */

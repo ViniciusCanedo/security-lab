@@ -117,6 +117,47 @@ class AuthService
         ];
     }
 
+    /**
+     * @return array{user: User, token: string}
+     */
+    public function handleSocialCallback(string $provider, SocialiteUser $socialUser): array
+    {
+        $user = $this->userRepository->findBySocialProvider($provider, $socialUser->getId());
+
+        if (! $user && $socialUser->getEmail()) {
+            $user = $this->userRepository->findByEmail($socialUser->getEmail());
+        }
+
+        if (! $user) {
+            /** @var User $user */
+            $user = $this->userRepository->create([
+                'name' => $socialUser->getName() ?? $socialUser->getNickname() ?? 'Usuário',
+                'email' => $socialUser->getEmail(),
+                'avatar' => $socialUser->getAvatar(),
+                'password' => null,
+            ]);
+
+            $user->assignRole(UserRole::COMMON->value);
+            SendWelcomeEmailJob::dispatch($user);
+        } else {
+            $this->userRepository->update($user, [
+                'avatar' => $socialUser->getAvatar() ?? $user->avatar,
+            ]);
+        }
+
+        $user->socialAccounts()->updateOrCreate(
+            ['provider' => $provider, 'provider_id' => $socialUser->getId()],
+            ['user_id' => $user->id]
+        );
+
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        return [
+            'user' => $user->fresh(['roles', 'permissions']),
+            'token' => $token,
+        ];
+    }
+
     public function sendPasswordResetLink(string $email): void
     {
         $user = $this->userRepository->findByEmail($email);
