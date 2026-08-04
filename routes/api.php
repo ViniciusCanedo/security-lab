@@ -59,4 +59,18 @@ Route::prefix('v1')->group(function () {
     Route::get('articles', [PublicArticleController::class, 'index']);
     Route::get('articles/{id}/comments', [CommentController::class, 'index']);
     Route::get('articles/{idOrSlug}', [PublicArticleController::class, 'show']);
+
+    // Public Newsletter Routes
+    Route::prefix('newsletter')->group(function () {
+        Route::post('subscribe', [\App\Http\Controllers\Api\V1\NewsletterController::class, 'subscribe']);
+        Route::get('confirm', [\App\Http\Controllers\Api\V1\NewsletterController::class, 'confirm']);
+        Route::post('unsubscribe', [\App\Http\Controllers\Api\V1\NewsletterController::class, 'unsubscribe']);
+    });
+
+    // Admin Newsletter Campaign Routes
+    Route::middleware('auth:sanctum')->prefix('admin/newsletter/campaigns')->group(function () {
+        Route::post('/', [\App\Http\Controllers\Api\V1\AdminNewsletterCampaignController::class, 'store']);
+        Route::post('/{id}/send', [\App\Http\Controllers\Api\V1\AdminNewsletterCampaignController::class, 'send']);
+        Route::get('/{id}/status', [\App\Http\Controllers\Api\V1\AdminNewsletterCampaignController::class, 'status']);
+    });
 });

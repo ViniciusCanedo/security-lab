@@ -38,6 +38,11 @@ class RepositoryServiceProvider extends ServiceProvider
             CommentRepositoryInterface::class,
             CommentRepositoryEloquent::class
         );
+
+        $this->app->bind(
+            \App\Repositories\Contracts\NewsletterRepositoryInterface::class,
+            \App\Repositories\Eloquent\NewsletterRepository::class
+        );
     }
 
     /**

@@ -43,6 +43,39 @@ return Application::configure(basePath: dirname(__DIR__))
             ], 403);
         });
 
+        $exceptions->render(function (\App\Exceptions\SubscriberAlreadyExistsException $e, Request $request) {
+            return response()->json([
+                'message' => $e->getMessage(),
+                'errors' => ['email' => [$e->getMessage()]],
+            ], 422);
+        });
+
+        $exceptions->render(function (\App\Exceptions\InvalidConfirmationTokenException $e, Request $request) {
+            return response()->json([
+                'message' => $e->getMessage(),
+                'errors' => ['token' => [$e->getMessage()]],
+            ], 422);
+        });
+
+        $exceptions->render(function (\App\Exceptions\InvalidUnsubscribeTokenException $e, Request $request) {
+            return response()->json([
+                'message' => $e->getMessage(),
+                'errors' => ['token' => [$e->getMessage()]],
+            ], 422);
+        });
+
+        $exceptions->render(function (\App\Exceptions\CampaignNotFoundException $e, Request $request) {
+            return response()->json([
+                'message' => $e->getMessage(),
+            ], 404);
+        });
+
+        $exceptions->render(function (\App\Exceptions\CampaignAlreadyDispatchedException $e, Request $request) {
+            return response()->json([
+                'message' => $e->getMessage(),
+            ], 422);
+        });
+
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*'),
         );
