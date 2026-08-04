@@ -10,6 +10,7 @@ use App\Exceptions\InvalidArticleStatusTransitionException;
 use App\Models\Article;
 use App\Repositories\Contracts\ArticleRepositoryInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Log;
 
 class ArticleService
 {
@@ -80,6 +81,16 @@ class ArticleService
 
     public function delete(Article $article): bool
     {
+        $actor = auth()->user();
+
+        Log::channel('audit')->info('Article deleted', [
+            'actor_id' => $actor?->id,
+            'article_id' => $article->id,
+            'action' => 'article_deletion',
+            'ip' => request()->ip(),
+            'timestamp' => now()->toIso8601String(),
+        ]);
+
         return $this->repository->delete($article);
     }
 }

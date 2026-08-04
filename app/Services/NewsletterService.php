@@ -30,7 +30,7 @@ class NewsletterService
         $existing = $this->repository->findSubscriberByEmail($dto->email);
         if ($existing) {
             if ($existing->status === SubscriberStatus::CONFIRMED) {
-                throw new SubscriberAlreadyExistsException();
+                throw new SubscriberAlreadyExistsException;
             }
             // Re-use pending/unsubscribed record by generating a new confirmation token
             $confirmationToken = Str::random(64);
@@ -55,7 +55,7 @@ class NewsletterService
     {
         $subscriber = $this->repository->findSubscriberByConfirmationToken($token);
         if (! $subscriber) {
-            throw new InvalidConfirmationTokenException();
+            throw new InvalidConfirmationTokenException;
         }
 
         $this->repository->updateSubscriberStatus($subscriber, SubscriberStatus::CONFIRMED->value);
@@ -67,7 +67,7 @@ class NewsletterService
     {
         $subscriber = $this->repository->findSubscriberByUnsubscribeToken($token);
         if (! $subscriber) {
-            throw new InvalidUnsubscribeTokenException();
+            throw new InvalidUnsubscribeTokenException;
         }
 
         $this->repository->updateSubscriberStatus($subscriber, SubscriberStatus::UNSUBSCRIBED->value);
@@ -84,11 +84,11 @@ class NewsletterService
     {
         $campaign = $this->repository->findCampaignById($campaignId);
         if (! $campaign) {
-            throw new CampaignNotFoundException();
+            throw new CampaignNotFoundException;
         }
 
         if ($campaign->status !== CampaignStatus::DRAFT) {
-            throw new CampaignAlreadyDispatchedException();
+            throw new CampaignAlreadyDispatchedException;
         }
 
         $this->repository->updateCampaignStatus($campaign, CampaignStatus::SENDING->value);
@@ -102,7 +102,7 @@ class NewsletterService
     {
         $campaign = $this->repository->findCampaignById($campaignId);
         if (! $campaign) {
-            throw new CampaignNotFoundException();
+            throw new CampaignNotFoundException;
         }
 
         $stats = $this->repository->getCampaignSendStats($campaignId);

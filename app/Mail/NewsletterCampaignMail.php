@@ -36,7 +36,7 @@ class NewsletterCampaignMail extends Mailable implements ShouldQueue
         $footer = "<hr/><p><small>Para cancelar sua inscrição, <a href=\"{$this->unsubscribeUrl}\">clique aqui</a>.</small></p>";
 
         return new Content(
-            htmlString: $body . $footer,
+            htmlString: $body.$footer,
         );
     }
 }

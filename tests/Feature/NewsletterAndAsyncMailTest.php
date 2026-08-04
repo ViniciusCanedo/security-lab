@@ -12,6 +12,7 @@ use App\Models\NewsletterCampaign;
 use App\Models\NewsletterSend;
 use App\Models\NewsletterSubscriber;
 use App\Models\User;
+use App\Repositories\Contracts\NewsletterRepositoryInterface;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Mail;
@@ -159,7 +160,7 @@ test('batch job chunks subscribers and dispatches SendNewsletterEmailJob', funct
     NewsletterSubscriber::create(['email' => 'sub3@exp.com', 'status' => SubscriberStatus::UNSUBSCRIBED, 'unsubscribe_token' => 't3']); // Ignored
 
     $batchJob = new SendNewsletterCampaignBatchJob($campaign->id);
-    $batchJob->handle(app(\App\Repositories\Contracts\NewsletterRepositoryInterface::class));
+    $batchJob->handle(app(NewsletterRepositoryInterface::class));
 
     Bus::assertBatched(function ($batch) {
         return $batch->jobs->count() === 2;
@@ -185,7 +186,7 @@ test('individual send job executes and updates send status and logs error on fai
     ]);
 
     $job = new SendNewsletterEmailJob($campaign->id, $subscriber->id);
-    $job->handle(app(\App\Repositories\Contracts\NewsletterRepositoryInterface::class));
+    $job->handle(app(NewsletterRepositoryInterface::class));
 
     Mail::assertQueued(NewsletterCampaignMail::class, function ($mail) use ($subscriber) {
         return $mail->hasTo($subscriber->email);

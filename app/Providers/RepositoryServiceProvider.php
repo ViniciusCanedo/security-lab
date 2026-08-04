@@ -5,10 +5,12 @@ namespace App\Providers;
 use App\Repositories\Contracts\ArticleRepositoryInterface;
 use App\Repositories\Contracts\CommentRepositoryInterface;
 use App\Repositories\Contracts\LikeRepositoryInterface;
+use App\Repositories\Contracts\NewsletterRepositoryInterface;
 use App\Repositories\Contracts\UserRepositoryInterface;
 use App\Repositories\Eloquent\ArticleRepositoryEloquent;
 use App\Repositories\Eloquent\CommentRepositoryEloquent;
 use App\Repositories\Eloquent\LikeRepositoryEloquent;
+use App\Repositories\Eloquent\NewsletterRepository;
 use App\Repositories\Eloquent\UserRepositoryEloquent;
 use Illuminate\Support\ServiceProvider;
 
@@ -40,8 +42,8 @@ class RepositoryServiceProvider extends ServiceProvider
         );
 
         $this->app->bind(
-            \App\Repositories\Contracts\NewsletterRepositoryInterface::class,
-            \App\Repositories\Eloquent\NewsletterRepository::class
+            NewsletterRepositoryInterface::class,
+            NewsletterRepository::class
         );
     }
 

@@ -8,7 +8,6 @@ use App\Models\NewsletterCampaign;
 use App\Models\NewsletterSubscriber;
 use App\Repositories\Contracts\NewsletterRepositoryInterface;
 use Illuminate\Bus\Batchable;
-
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Log;

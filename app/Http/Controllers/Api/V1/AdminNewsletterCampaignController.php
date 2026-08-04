@@ -6,8 +6,10 @@ use App\DTOs\CreateCampaignDTO;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreCampaignRequest;
 use App\Http\Resources\NewsletterCampaignResource;
+use App\Models\NewsletterCampaign;
 use App\Services\NewsletterService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Gate;
 
 class AdminNewsletterCampaignController extends Controller
 {
@@ -17,7 +19,7 @@ class AdminNewsletterCampaignController extends Controller
 
     public function store(StoreCampaignRequest $request): JsonResponse
     {
-        \Illuminate\Support\Facades\Gate::authorize('manage', \App\Models\NewsletterCampaign::class);
+        Gate::authorize('manage', NewsletterCampaign::class);
 
         $dto = CreateCampaignDTO::fromArray($request->validated(), $request->user()->id);
         $campaign = $this->newsletterService->createCampaign($dto);
@@ -30,7 +32,7 @@ class AdminNewsletterCampaignController extends Controller
 
     public function send(int $id): JsonResponse
     {
-        \Illuminate\Support\Facades\Gate::authorize('manage', \App\Models\NewsletterCampaign::class);
+        Gate::authorize('manage', NewsletterCampaign::class);
 
         $campaign = $this->newsletterService->dispatchCampaign($id);
 
@@ -42,7 +44,7 @@ class AdminNewsletterCampaignController extends Controller
 
     public function status(int $id): JsonResponse
     {
-        \Illuminate\Support\Facades\Gate::authorize('manage', \App\Models\NewsletterCampaign::class);
+        Gate::authorize('manage', NewsletterCampaign::class);
 
         $status = $this->newsletterService->getCampaignStatus($id);
 

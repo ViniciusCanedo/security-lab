@@ -11,6 +11,7 @@ use App\Models\User;
 use App\Repositories\Contracts\UserRepositoryInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 
 class UserManagementService
 {
@@ -44,6 +45,16 @@ class UserManagementService
 
     public function deleteUser(User $user): bool
     {
+        $actor = auth()->user();
+
+        Log::channel('audit')->info('User deleted', [
+            'actor_id' => $actor?->id,
+            'target_user_id' => $user->id,
+            'action' => 'user_deletion',
+            'ip' => request()->ip(),
+            'timestamp' => now()->toIso8601String(),
+        ]);
+
         return $this->userRepository->delete($user);
     }
 
@@ -62,6 +73,16 @@ class UserManagementService
             'old_values' => ['roles' => $oldRoles],
             'new_values' => ['roles' => $newRoles],
             'created_at' => now(),
+        ]);
+
+        Log::channel('audit')->info('User role updated', [
+            'actor_id' => $actor->id,
+            'target_user_id' => $target->id,
+            'action' => 'role_elevation',
+            'old_roles' => $oldRoles,
+            'new_roles' => $newRoles,
+            'ip' => request()->ip(),
+            'timestamp' => now()->toIso8601String(),
         ]);
 
         return $target->fresh(['roles', 'permissions']);
@@ -89,6 +110,16 @@ class UserManagementService
             'old_values' => ['direct_permissions' => $oldDirectPermissions],
             'new_values' => ['direct_permissions' => $newDirectPermissions],
             'created_at' => now(),
+        ]);
+
+        Log::channel('audit')->info('User permissions updated', [
+            'actor_id' => $actor->id,
+            'target_user_id' => $target->id,
+            'action' => 'permission_'.$dto->action,
+            'old_permissions' => $oldDirectPermissions,
+            'new_permissions' => $newDirectPermissions,
+            'ip' => request()->ip(),
+            'timestamp' => now()->toIso8601String(),
         ]);
 
         return $target->fresh(['roles', 'permissions']);

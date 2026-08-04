@@ -1,16 +1,18 @@
 <?php
 
+use App\Http\Controllers\Api\V1\AdminNewsletterCampaignController;
 use App\Http\Controllers\Api\V1\AdminUserController;
 use App\Http\Controllers\Api\V1\ArticleController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\CommentController;
 use App\Http\Controllers\Api\V1\LikeController;
+use App\Http\Controllers\Api\V1\NewsletterController;
 use App\Http\Controllers\Api\V1\PublicArticleController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
     // Guest Auth Routes
-    Route::prefix('auth')->group(function () {
+    Route::prefix('auth')->middleware('throttle:auth-limiter')->group(function () {
         Route::post('register', [AuthController::class, 'register']);
         Route::post('login', [AuthController::class, 'login']);
         Route::get('google/redirect', [AuthController::class, 'googleRedirect']);
@@ -44,11 +46,11 @@ Route::prefix('v1')->group(function () {
 
             // Engagement Routes (Likes & Comments)
             Route::post('/{id}/like', [LikeController::class, 'toggle']);
-            Route::post('/{id}/comments', [CommentController::class, 'store']);
+            Route::post('/{id}/comments', [CommentController::class, 'store'])->middleware('throttle:comments-limiter');
         });
 
         // Comment Management Routes
-        Route::prefix('comments')->group(function () {
+        Route::prefix('comments')->middleware('throttle:comments-limiter')->group(function () {
             Route::post('/{id}/replies', [CommentController::class, 'reply']);
             Route::put('/{id}', [CommentController::class, 'update']);
             Route::delete('/{id}', [CommentController::class, 'destroy']);
@@ -61,16 +63,16 @@ Route::prefix('v1')->group(function () {
     Route::get('articles/{idOrSlug}', [PublicArticleController::class, 'show']);
 
     // Public Newsletter Routes
-    Route::prefix('newsletter')->group(function () {
-        Route::post('subscribe', [\App\Http\Controllers\Api\V1\NewsletterController::class, 'subscribe']);
-        Route::get('confirm', [\App\Http\Controllers\Api\V1\NewsletterController::class, 'confirm']);
-        Route::post('unsubscribe', [\App\Http\Controllers\Api\V1\NewsletterController::class, 'unsubscribe']);
+    Route::prefix('newsletter')->middleware('throttle:newsletter-limiter')->group(function () {
+        Route::post('subscribe', [NewsletterController::class, 'subscribe']);
+        Route::get('confirm', [NewsletterController::class, 'confirm']);
+        Route::post('unsubscribe', [NewsletterController::class, 'unsubscribe']);
     });
 
     // Admin Newsletter Campaign Routes
     Route::middleware('auth:sanctum')->prefix('admin/newsletter/campaigns')->group(function () {
-        Route::post('/', [\App\Http\Controllers\Api\V1\AdminNewsletterCampaignController::class, 'store']);
-        Route::post('/{id}/send', [\App\Http\Controllers\Api\V1\AdminNewsletterCampaignController::class, 'send']);
-        Route::get('/{id}/status', [\App\Http\Controllers\Api\V1\AdminNewsletterCampaignController::class, 'status']);
+        Route::post('/', [AdminNewsletterCampaignController::class, 'store']);
+        Route::post('/{id}/send', [AdminNewsletterCampaignController::class, 'send']);
+        Route::get('/{id}/status', [AdminNewsletterCampaignController::class, 'status']);
     });
 });

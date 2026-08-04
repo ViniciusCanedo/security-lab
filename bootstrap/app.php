@@ -1,8 +1,13 @@
 <?php
 
+use App\Exceptions\CampaignAlreadyDispatchedException;
+use App\Exceptions\CampaignNotFoundException;
 use App\Exceptions\InsufficientPermissionException;
+use App\Exceptions\InvalidConfirmationTokenException;
 use App\Exceptions\InvalidCredentialsException;
 use App\Exceptions\InvalidResetTokenException;
+use App\Exceptions\InvalidUnsubscribeTokenException;
+use App\Exceptions\SubscriberAlreadyExistsException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -43,34 +48,34 @@ return Application::configure(basePath: dirname(__DIR__))
             ], 403);
         });
 
-        $exceptions->render(function (\App\Exceptions\SubscriberAlreadyExistsException $e, Request $request) {
+        $exceptions->render(function (SubscriberAlreadyExistsException $e, Request $request) {
             return response()->json([
                 'message' => $e->getMessage(),
                 'errors' => ['email' => [$e->getMessage()]],
             ], 422);
         });
 
-        $exceptions->render(function (\App\Exceptions\InvalidConfirmationTokenException $e, Request $request) {
+        $exceptions->render(function (InvalidConfirmationTokenException $e, Request $request) {
             return response()->json([
                 'message' => $e->getMessage(),
                 'errors' => ['token' => [$e->getMessage()]],
             ], 422);
         });
 
-        $exceptions->render(function (\App\Exceptions\InvalidUnsubscribeTokenException $e, Request $request) {
+        $exceptions->render(function (InvalidUnsubscribeTokenException $e, Request $request) {
             return response()->json([
                 'message' => $e->getMessage(),
                 'errors' => ['token' => [$e->getMessage()]],
             ], 422);
         });
 
-        $exceptions->render(function (\App\Exceptions\CampaignNotFoundException $e, Request $request) {
+        $exceptions->render(function (CampaignNotFoundException $e, Request $request) {
             return response()->json([
                 'message' => $e->getMessage(),
             ], 404);
         });
 
-        $exceptions->render(function (\App\Exceptions\CampaignAlreadyDispatchedException $e, Request $request) {
+        $exceptions->render(function (CampaignAlreadyDispatchedException $e, Request $request) {
             return response()->json([
                 'message' => $e->getMessage(),
             ], 422);

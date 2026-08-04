@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
@@ -15,9 +16,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property SubscriberStatus $status
  * @property string|null $confirmation_token
  * @property string|null $unsubscribe_token
- * @property \Illuminate\Support\Carbon|null $subscribed_at
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property Carbon|null $subscribed_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
  */
 #[Fillable(['email', 'status', 'confirmation_token', 'unsubscribe_token', 'subscribed_at'])]
 class NewsletterSubscriber extends Model

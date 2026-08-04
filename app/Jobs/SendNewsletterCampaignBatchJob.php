@@ -3,7 +3,7 @@
 namespace App\Jobs;
 
 use App\Enums\CampaignStatus;
-use App\Models\NewsletterCampaign;
+use App\Models\NewsletterSubscriber;
 use App\Repositories\Contracts\NewsletterRepositoryInterface;
 use Illuminate\Bus\Batch;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -35,11 +35,12 @@ class SendNewsletterCampaignBatchJob implements ShouldQueue
 
         if ($subscribers->isEmpty()) {
             $repository->updateCampaignStatus($campaign, CampaignStatus::COMPLETED->value);
+
             return;
         }
 
         $jobs = [];
-        /** @var \App\Models\NewsletterSubscriber $subscriber */
+        /** @var NewsletterSubscriber $subscriber */
         foreach ($subscribers as $subscriber) {
             $repository->createSendRecord($campaign->id, $subscriber->id);
             $jobs[] = new SendNewsletterEmailJob($campaign->id, $subscriber->id);
@@ -58,7 +59,7 @@ class SendNewsletterCampaignBatchJob implements ShouldQueue
                 }
             })
             ->catch(function (Batch $batch, Throwable $e) use ($campaignId) {
-                Log::error("Newsletter Campaign Batch failed for campaign {$campaignId}: " . $e->getMessage());
+                Log::error("Newsletter Campaign Batch failed for campaign {$campaignId}: ".$e->getMessage());
             })
             ->finally(function (Batch $batch) use ($campaignId) {
                 $repo = app(NewsletterRepositoryInterface::class);
