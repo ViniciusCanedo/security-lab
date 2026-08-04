@@ -1,7 +1,9 @@
 <?php
 
 use App\Http\Controllers\Api\V1\AdminUserController;
+use App\Http\Controllers\Api\V1\ArticleController;
 use App\Http\Controllers\Api\V1\AuthController;
+use App\Http\Controllers\Api\V1\PublicArticleController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
@@ -28,5 +30,19 @@ Route::prefix('v1')->group(function () {
             Route::put('/{user}/role', [AdminUserController::class, 'updateRole']);
             Route::post('/{user}/permissions', [AdminUserController::class, 'updatePermissions']);
         });
+
+        // Authenticated Article Management
+        Route::prefix('articles')->group(function () {
+            Route::get('/manage', [ArticleController::class, 'index']);
+            Route::post('/', [ArticleController::class, 'store']);
+            Route::get('/manage/{id}', [ArticleController::class, 'show']);
+            Route::put('/{id}', [ArticleController::class, 'update']);
+            Route::patch('/{id}/archive', [ArticleController::class, 'archive']);
+            Route::delete('/{id}', [ArticleController::class, 'destroy']);
+        });
     });
+
+    // Public Article Endpoints
+    Route::get('articles', [PublicArticleController::class, 'index']);
+    Route::get('articles/{idOrSlug}', [PublicArticleController::class, 'show']);
 });
