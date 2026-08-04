@@ -1,7 +1,11 @@
 <?php
 
 use App\Http\Controllers\Api\V1\AdminUserController;
+use App\Http\Controllers\Api\V1\ArticleController;
 use App\Http\Controllers\Api\V1\AuthController;
+use App\Http\Controllers\Api\V1\CommentController;
+use App\Http\Controllers\Api\V1\LikeController;
+use App\Http\Controllers\Api\V1\PublicArticleController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
@@ -28,5 +32,45 @@ Route::prefix('v1')->group(function () {
             Route::put('/{user}/role', [AdminUserController::class, 'updateRole']);
             Route::post('/{user}/permissions', [AdminUserController::class, 'updatePermissions']);
         });
+
+        // Authenticated Article Management
+        Route::prefix('articles')->group(function () {
+            Route::get('/manage', [ArticleController::class, 'index']);
+            Route::post('/', [ArticleController::class, 'store']);
+            Route::get('/manage/{id}', [ArticleController::class, 'show']);
+            Route::put('/{id}', [ArticleController::class, 'update']);
+            Route::patch('/{id}/archive', [ArticleController::class, 'archive']);
+            Route::delete('/{id}', [ArticleController::class, 'destroy']);
+
+            // Engagement Routes (Likes & Comments)
+            Route::post('/{id}/like', [LikeController::class, 'toggle']);
+            Route::post('/{id}/comments', [CommentController::class, 'store']);
+        });
+
+        // Comment Management Routes
+        Route::prefix('comments')->group(function () {
+            Route::post('/{id}/replies', [CommentController::class, 'reply']);
+            Route::put('/{id}', [CommentController::class, 'update']);
+            Route::delete('/{id}', [CommentController::class, 'destroy']);
+        });
+    });
+
+    // Public Article Endpoints
+    Route::get('articles', [PublicArticleController::class, 'index']);
+    Route::get('articles/{id}/comments', [CommentController::class, 'index']);
+    Route::get('articles/{idOrSlug}', [PublicArticleController::class, 'show']);
+
+    // Public Newsletter Routes
+    Route::prefix('newsletter')->group(function () {
+        Route::post('subscribe', [\App\Http\Controllers\Api\V1\NewsletterController::class, 'subscribe']);
+        Route::get('confirm', [\App\Http\Controllers\Api\V1\NewsletterController::class, 'confirm']);
+        Route::post('unsubscribe', [\App\Http\Controllers\Api\V1\NewsletterController::class, 'unsubscribe']);
+    });
+
+    // Admin Newsletter Campaign Routes
+    Route::middleware('auth:sanctum')->prefix('admin/newsletter/campaigns')->group(function () {
+        Route::post('/', [\App\Http\Controllers\Api\V1\AdminNewsletterCampaignController::class, 'store']);
+        Route::post('/{id}/send', [\App\Http\Controllers\Api\V1\AdminNewsletterCampaignController::class, 'send']);
+        Route::get('/{id}/status', [\App\Http\Controllers\Api\V1\AdminNewsletterCampaignController::class, 'status']);
     });
 });
